@@ -105,3 +105,29 @@ export const accountRelations = relations(account, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+
+export const posts = sqliteTable("posts", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  title: text("title").notNull(),
+  slug: text("slug").notNull(),
+  content: text("content").notNull(),
+  likes: integer("likes").default(0),
+  
+  // Author relationship
+  authorId: text("author_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+    
+  // Metadata
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+// Optional: Type inference for use in your frontend
+export type Posts = typeof posts.$inferSelect;
+export type NewPosts = typeof posts.$inferInsert;
