@@ -1,18 +1,17 @@
-import { command, form, getRequestEvent, query } from '$app/server';
+import { form, getRequestEvent, query } from '$app/server';
 import { auth } from '$lib/server/auth';
 import { signinSchema, signupSchema } from '$lib/schema/auth';
 import { redirect } from '@sveltejs/kit';
-// import { socialProviders } from "better-auth";
 
 export const signup = form(signupSchema, async (user) => {
 	await auth.api.signUpEmail({ body: user });
-	redirect(307, '/');
+	redirect(307, '/admin');
 });
 
 export const signin = form(signinSchema, async (user) => {
 	const { request } = getRequestEvent();
 	await auth.api.signInEmail({ body: user, headers: request.headers });
-	redirect(303, '/');
+	redirect(303, '/admin');
 });
 
 export const signout = form(async () => {
@@ -27,9 +26,4 @@ export const getUser = query(async () => {
 		redirect(307, '/signin');
 	}
 	return locals.user;
-});
-
-export const socialsignin = command(async () => {
-	const { request } = getRequestEvent();
-	await auth.api.signInSocial({ body: { provider: 'google' }, headers: request.headers });
 });
